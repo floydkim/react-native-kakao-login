@@ -306,6 +306,14 @@ public class RNKakaoLoginsModule extends ReactContextBaseJavaModule implements A
     }
 
     @ReactMethod
+        private void loginKakaoTalk(Promise promise) {
+            initKakaoSDK();
+            loginPromise = promise;
+
+            Session.getCurrentSession().open(AuthType.KAKAO_TALK, reactContext.getCurrentActivity());
+    }
+
+    @ReactMethod
     private void logout(final Promise promise) {
         initKakaoSDK();
         UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {

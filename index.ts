@@ -98,6 +98,36 @@ export function login(callback?: ICallback<ITokenInfo>): Promise<ITokenInfo> {
 }
 
 /**
+ * loginKakaoTalk
+ * @param {ICallback<ITokenInfo>} [callback] callback function
+ * @returns {Promise<ITokenInfo>}
+ */
+export function loginKakaoTalk(
+  callback?: ICallback<ITokenInfo>
+): Promise<ITokenInfo> {
+  return RNKakaoLogins.loginKakaoTalk()
+    .then((result: ITokenInfo) => {
+      const timeReFormattedResult = {
+        ...result,
+        accessTokenExpiresAt: result.accessTokenExpiresAt.replace(" ", "T"),
+        refreshTokenExpiresAt: result.refreshTokenExpiresAt.replace(" ", "T"),
+      };
+      if (isFunction(callback)) {
+        callback(null, timeReFormattedResult);
+      }
+
+      return timeReFormattedResult;
+    })
+    .catch((error) => {
+      if (isFunction(callback)) {
+        callback(error, null);
+      }
+
+      throw error;
+    });
+}
+
+/**
  * logout
  * @param {ICallback<string>} [callback] callback function
  * @returns {Promise<string>}
@@ -213,6 +243,7 @@ export function getTokens(
 
 const KakaoLogins = {
   login,
+  loginKakaoTalk,
   logout,
   getProfile,
   unlink,

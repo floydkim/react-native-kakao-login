@@ -97,6 +97,29 @@ RCT_EXPORT_METHOD(login:(RCTPromiseResolveBlock)resolve
     }];
 }
 
+RCT_EXPORT_METHOD(loginKakaoTalk:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    KOSession *session = [KOSession sharedSession];
+    [session close]; // ensure old session was closed
+
+    [session openWithCompletionHandler:^(NSError *error) {
+        if ([session isOpen]) {
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
+
+            resolve(@{@"accessToken": session.token.accessToken,
+                      @"refreshToken": session.token.refreshToken,
+                      @"accessTokenExpiresAt": [formatter stringFromDate: session.token.accessTokenExpiresAt],
+                      @"refreshTokenExpiresAt": session.token.refreshTokenExpiresAt != nil ? [formatter stringFromDate: session.token.refreshTokenExpiresAt] : [NSNull null],
+                      @"scopes": session.token.scopes != nil ? session.token.scopes : @[]});
+        } else {
+            RCTLogInfo(@"Error=%@", error);
+            reject(getErrorCode(error), error.localizedDescription, error);
+        }
+    } authType:(KOAuthType)KOAuthTypeTalk, nil];
+}
+
 RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
